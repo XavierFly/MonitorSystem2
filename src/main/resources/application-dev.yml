@@ -1,0 +1,10 @@
+# MongoDB 配置
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/monitor_system
+
+# slf4j 配置
+logging:
+  level:
+    com.yizhi: debug
