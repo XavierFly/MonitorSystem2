@@ -20,7 +20,7 @@ public class MonitorSystem2ApplicationTests {
     }
 
     @Test
-    public void test() {
+    public void addOneWebServerAccessLog() {
         WebServerAccessLogEntity webServerAccessLogEntity = new WebServerAccessLogEntity();
         webServerAccessLogEntity.setTimestamp(111);
         webServerAccessLogEntity.setUrl("123");
@@ -32,6 +32,11 @@ public class MonitorSystem2ApplicationTests {
         webServerAccessLogRepository.save(webServerAccessLogEntity);
 
         System.out.println(webServerAccessLogRepository.findAll());
+    }
+
+    @Test
+    public void dropWebServerAccessLog() {
+        webServerAccessLogRepository.deleteAll();
     }
 }
 
