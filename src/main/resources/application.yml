@@ -30,7 +30,16 @@ spring:
 # 自定义配置
 web:
   server:
-    nginxSign: 0
-    nginxName: Nginx
-    tomcatSign: 1
-    tomcatName: Tomcat
+    nginx-sign: 0
+    nginx-name: Nginx
+    tomcat-sign: 1
+    tomcat-name: Tomcat
+
+ssh:
+  strict-host-key-checking: no
+  open-channel: exec
+  charset: UTF-8
+
+time:
+  common-time-format: yyyy-MM-dd HH:mm:ss
+  hour-time-format: yyyy-MM-dd HH:00:00

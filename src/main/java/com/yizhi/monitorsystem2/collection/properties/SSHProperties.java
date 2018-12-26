@@ -10,13 +10,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ToString
 @Component
-@ConfigurationProperties(prefix = "web.server")
-public class WebServerProperties {
-    private int nginxSign;
+@ConfigurationProperties(prefix = "ssh")
+public class SSHProperties {
+    private String strictHostKeyChecking;
 
-    private String nginxName;
+    private String openChannel;
 
-    private int tomcatSign;
-
-    private String tomcatName;
+    private String charset;
 }

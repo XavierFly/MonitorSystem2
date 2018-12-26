@@ -10,13 +10,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ToString
 @Component
-@ConfigurationProperties(prefix = "web.server")
-public class WebServerProperties {
-    private int nginxSign;
+@ConfigurationProperties(prefix = "time")
+public class TimeProperties {
+    private String commonTimeFormat;
 
-    private String nginxName;
-
-    private int tomcatSign;
-
-    private String tomcatName;
+    private String hourTimeFormat;
 }
