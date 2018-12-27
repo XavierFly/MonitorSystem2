@@ -20,12 +20,15 @@ public class SSHUtil {
     @Autowired
     private SSHProperties sshProperties;
 
+    private String host;
     private Session session;
     private Channel channel;
     private BufferedReader bufferedReader;
 
     public SSHUtil(ServerEntity serverEntity) {
         try {
+            this.host = serverEntity.getHost();
+
             JSch jsch = new JSch();
             session = jsch.getSession(serverEntity.getUser(), serverEntity.getHost(), serverEntity.getPort());
 
@@ -77,5 +80,9 @@ public class SSHUtil {
                 logger.error(e.getMessage(), e);
             }
         }
+    }
+
+    public String getHost() {
+        return host;
     }
 }

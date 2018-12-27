@@ -1,6 +1,8 @@
 package com.yizhi.monitorsystem2.collection.handle.log;
 
 import java.util.Optional;
+
+import com.yizhi.monitorsystem2.collection.util.SSHUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ public class LogHandle {
     }
 
     private void handle() {
+        SSHUtil sshUtil = new SSHUtil(serverEntity);
+
         int[] serverTypes = serverEntity.getTypes();
 
         for (int currentServerType : serverTypes) {
@@ -30,9 +34,11 @@ public class LogHandle {
             switch (currentServerType) {
                 case 1:
                 case 2:
-                    new WebServerAccessLogHandle(serverEntity, currentServerType).handle();
+                    new WebServerAccessLogHandle(sshUtil, currentServerType).handle();
                     break;
             }
         }
+
+        sshUtil.close();
     }
 }

@@ -1,60 +1,87 @@
 package com.yizhi.monitorsystem2.collection.handle.log;
 
-import com.yizhi.monitorsystem2.collection.exception.BaseException;
-import com.yizhi.monitorsystem2.collection.util.TimeUtil;
+import java.io.IOException;
+import java.io.BufferedReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.yizhi.monitorsystem2.collection.util.SSHUtil;
-import com.yizhi.monitorsystem2.collection.entity.ServerEntity;
+import com.yizhi.monitorsystem2.collection.util.TimeUtil;
 import com.yizhi.monitorsystem2.collection.entity.LogTraceEntity;
+import com.yizhi.monitorsystem2.collection.exception.BaseException;
 import com.yizhi.monitorsystem2.collection.repository.LogTraceRepository;
-
-import java.io.BufferedReader;
 
 public abstract class LogAbstractHandle {
     @Autowired
     private LogTraceRepository logTraceRepository;
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
-    protected SSHUtil sshUtil;
-    protected LogTraceEntity logTraceEntity;
-    protected int lastRow;
-    protected long lastTimestamp;
-    protected long currentHourTimestamp;
-    protected BufferedReader bufferedReader;
 
-    protected LogAbstractHandle(ServerEntity serverEntity, int currentServerType) {
-        sshUtil = new SSHUtil(serverEntity);
-        logTraceEntity = logTraceRepository.findByHostAndServerType(serverEntity.getHost(), currentServerType);
+    private SSHUtil sshUtil;
+
+    protected String host;
+    protected int currentServerType;
+    protected int lastRow;
+    protected int newRow;
+    protected long currentHourTimestamp;
+
+    public LogAbstractHandle() {
     }
 
-    protected boolean initVariable() {
+    protected LogAbstractHandle(SSHUtil sshUtil, int currentServerType) {
+        this.sshUtil = sshUtil;
+        this.host = sshUtil.getHost();
+        this.currentServerType = currentServerType;
+    }
+
+    protected abstract boolean parseCurrentLine(String currentLine);
+
+    protected abstract void saveLogEntity();
+
+    public void handle() {
+        LogTraceEntity logTraceEntity = logTraceRepository.findByHostAndServerType(host, currentServerType);
+        lastRow = logTraceEntity.getLastRow();
+
         try {
             currentHourTimestamp = TimeUtil.getCurrentHourTimestamp();
         } catch (BaseException e) {
-            return false;
+            return;
         }
 
-        lastRow = logTraceEntity.getLastRow();
-        lastTimestamp = logTraceEntity.getLastTimestamp();
-
-        if (lastTimestamp == currentHourTimestamp && lastRow != 0) {
-            logger.info("This hour has been collected");
-            return false;
+        if (logTraceEntity.getLastTimestamp() == currentHourTimestamp && lastRow != 0) {
+            return;
         }
 
-        bufferedReader = sshUtil.readFile("", lastRow);
+        BufferedReader bufferedReader = sshUtil.readFile("", lastRow);
+        try {
+            String currentLine;
+            while ((currentLine = bufferedReader.readLine()) != null) {
+                if (!parseCurrentLine(currentLine)) {
+                    break;
+                }
+                lastRow++;
+            }
+        } catch (IOException e) {
+            logger.error(e.toString(), e);
+            return;
+        }
 
-        return true;
+        collectLog();
     }
 
-    protected abstract void handle();
+    private void collectLog() {
+        saveLogEntity();
 
-    protected void close() {
-        if (sshUtil != null) {
-            sshUtil.close();
+        if (TimeUtil.isMidNight(currentHourTimestamp)) {
+            newRow = 0;
         }
+
+        LogTraceEntity logTraceEntity = new LogTraceEntity();
+        logTraceEntity.setHost(host);
+        logTraceEntity.setServerType(currentServerType);
+        logTraceEntity.setLastRow(newRow);
+        logTraceEntity.setLastTimestamp(currentHourTimestamp);
+        logTraceRepository.save(logTraceEntity);
     }
 }
