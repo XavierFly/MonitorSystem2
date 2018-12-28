@@ -3,11 +3,10 @@ package com.yizhi.monitorsystem2.collection.handle.log;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.yizhi.monitorsystem2.collection.util.SSHUtil;
-import com.yizhi.monitorsystem2.collection.util.TimeUtil;
+import com.yizhi.monitorsystem2.collection.util.TimeAndLogUtil;
 import com.yizhi.monitorsystem2.collection.exception.BaseException;
 import com.yizhi.monitorsystem2.collection.entity.WebServerAccessLogEntity;
 import com.yizhi.monitorsystem2.collection.repository.WebServerAccessLogRepository;
@@ -64,7 +63,7 @@ public class WebServerAccessLogHandle extends LogAbstractHandle {
 
             if (lineSplitItem.contains("\"")) {
                 if (lineSplitItem.startsWith("\"")) {
-                    if (lineSplitItem.endsWith("\"") || Pattern.matches("^.+[1-9]\\d{0,2}$", lineSplitItem)) {
+                    if (lineSplitItem.endsWith("\"") || Pattern.matches("^\".+\"[1-9]\\d{0,2}$", lineSplitItem)) {
                         try {
                             currentLineList.add(lineSplitItem.substring(0, lineSplitItemLength));
                         } catch (StringIndexOutOfBoundsException e) {
@@ -99,13 +98,13 @@ public class WebServerAccessLogHandle extends LogAbstractHandle {
 
         long timestamp;
         try {
-            timestamp = Long.parseLong(TimeUtil.parseSystemLogTime(currentLineList.get(1)));
+            timestamp = Long.parseLong(TimeAndLogUtil.parseSystemLogTime(currentLineList.get(1)));
         } catch (BaseException e) {
             return false;
         }
 
         String url = currentLineList.get(2);
-        if (url.startsWith("POST") || url.startsWith("GET")) {
+        if (url.startsWith("\"POST") || url.startsWith("\"GET")) {
             url = url.substring(url.indexOf(" ") + 1, url.lastIndexOf(" "));
         } else {
             url = url.substring(0, url.length() - 1);

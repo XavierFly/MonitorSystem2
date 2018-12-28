@@ -31,15 +31,32 @@ spring:
 web:
   server:
     nginx-sign: 0
-    nginx-name: Nginx
+    nginx-name: "Nginx"
     tomcat-sign: 1
-    tomcat-name: Tomcat
+    tomcat-name: "Tomcat"
 
 ssh:
-  strict-host-key-checking: no
-  open-channel: exec
-  charset: UTF-8
+  strict-host-key-checking: "no"
+  open-channel: "exec"
+  charset: "UTF-8"
 
 time:
-  common-time-format: yyyy-MM-dd HH:mm:ss
-  hour-time-format: yyyy-MM-dd HH:00:00
+  common-time-format: "yyyy-MM-dd HH:mm:ss"
+  hour-time-format: "yyyy-MM-dd HH:00:00"
+  mid-night: "00:00:00"
+  nginx-log-time-format: "yyyyMMdd HH:mm:ss"
+  nginx-log-time-simple-format: "yyyyMMdd"
+  nginx-log-time-format-on-hour: "yyyyMMdd HH:00:00"
+  tomcat-log-time-format: "yyyy-MM-dd HH:mm:ss"
+  tomcat-log-time-simple-format: "yyyy-MM-dd"
+  tomcat-log-time-format-on-hour: "yyyy-MM-dd HH:00:00"
+
+log:
+  nginx-log-separator: "_"
+  nginx-log-format: ".log"
+  tomcat-log-separator: ""
+  tomcat-log-format: ".txt"
+
+
+
+

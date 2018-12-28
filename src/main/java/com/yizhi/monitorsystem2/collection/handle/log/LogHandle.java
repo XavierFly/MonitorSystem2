@@ -1,20 +1,26 @@
 package com.yizhi.monitorsystem2.collection.handle.log;
 
 import java.util.Optional;
-
-import com.yizhi.monitorsystem2.collection.util.SSHUtil;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.yizhi.monitorsystem2.collection.util.SSHUtil;
 import com.yizhi.monitorsystem2.collection.entity.ServerEntity;
+import com.yizhi.monitorsystem2.collection.entity.ServerTypeEntity;
 import com.yizhi.monitorsystem2.collection.repository.ServerRepository;
+import com.yizhi.monitorsystem2.collection.repository.ServerTypeRepository;
 
 public class LogHandle {
-    private Logger logger = LoggerFactory.getLogger(getClass());
-
     @Autowired
     private ServerRepository serverRepository;
+
+    @Autowired
+    private ServerTypeRepository serverTypeRepository;
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private ServerEntity serverEntity;
 
@@ -29,13 +35,16 @@ public class LogHandle {
         int[] serverTypes = serverEntity.getTypes();
 
         for (int currentServerType : serverTypes) {
-            // 暂时只有 web access 日志，之后再增加相应的分析类。
-            // 暂时使用 switch，之后改为工厂模式。
-            switch (currentServerType) {
-                case 1:
-                case 2:
-                    new WebServerAccessLogHandle(sshUtil, currentServerType).handle();
-                    break;
+            ServerTypeEntity serverTypeEntity = serverTypeRepository.findByTypesContains(currentServerType);
+            String classPath = this.getClass().getPackage().getName() + "." + serverTypeEntity.getClassName();
+            try {
+                Class<?> classObject = Class.forName(classPath);
+                Constructor constructor = classObject.getDeclaredConstructor(SSHUtil.class, int.class);
+                constructor.setAccessible(true);
+                LogAbstractHandle logAbstractHandle = (LogAbstractHandle) constructor.newInstance(sshUtil, currentServerType);
+                logAbstractHandle.handle();
+            } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
+                logger.error(e.toString(), e);
             }
         }
 

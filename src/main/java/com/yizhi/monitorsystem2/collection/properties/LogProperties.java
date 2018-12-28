@@ -13,25 +13,19 @@ import com.yizhi.monitorsystem2.collection.util.TimeAndLogUtil;
 @Setter
 @ToString
 @Component
-@ConfigurationProperties(prefix = "time")
-public class TimeProperties {
-    private String commonTimeFormat;
+@ConfigurationProperties(prefix = "log")
+public class LogProperties {
+    private String nginxLogFormat;
 
-    private String hourTimeFormat;
+    private String nginxLogPath;
 
-    private String midNight;
+    private String nginxLogSeparator;
 
-    private String nginxLogTimeFormat;
+    private String tomcatLogPath;
 
-    private String nginxLogTimeSimpleFormat;
+    private String tomcatLogFormat;
 
-    private String nginxLogTimeFormatOnHour;
-
-    private String tomcatLogTimeFormat;
-
-    private String tomcatLogTimeSimpleFormat;
-
-    private String tomcatLogTimeFormatOnHour;
+    private String tomcatLogSeparator;
 
     @PostConstruct
     public void init(){

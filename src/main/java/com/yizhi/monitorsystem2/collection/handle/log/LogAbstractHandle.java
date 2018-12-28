@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.yizhi.monitorsystem2.collection.util.SSHUtil;
-import com.yizhi.monitorsystem2.collection.util.TimeUtil;
+import com.yizhi.monitorsystem2.collection.util.TimeAndLogUtil;
 import com.yizhi.monitorsystem2.collection.entity.LogTraceEntity;
 import com.yizhi.monitorsystem2.collection.exception.BaseException;
 import com.yizhi.monitorsystem2.collection.repository.LogTraceRepository;
@@ -44,7 +44,7 @@ public abstract class LogAbstractHandle {
         lastRow = logTraceEntity.getLastRow();
 
         try {
-            currentHourTimestamp = TimeUtil.getCurrentHourTimestamp();
+            currentHourTimestamp = TimeAndLogUtil.getCurrentHourTimestamp();
         } catch (BaseException e) {
             return;
         }
@@ -53,7 +53,14 @@ public abstract class LogAbstractHandle {
             return;
         }
 
-        BufferedReader bufferedReader = sshUtil.readFile("", lastRow);
+        String logFilePath;
+        try {
+            logFilePath = TimeAndLogUtil.getLogFilePath(currentServerType);
+        } catch (BaseException e) {
+            return;
+        }
+
+        BufferedReader bufferedReader = sshUtil.readFile(logFilePath, lastRow);
         try {
             String currentLine;
             while ((currentLine = bufferedReader.readLine()) != null) {
@@ -73,7 +80,7 @@ public abstract class LogAbstractHandle {
     private void collectLog() {
         saveLogEntity();
 
-        if (TimeUtil.isMidNight(currentHourTimestamp)) {
+        if (TimeAndLogUtil.isMidNight(currentHourTimestamp)) {
             newRow = 0;
         }
 

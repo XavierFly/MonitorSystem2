@@ -17,13 +17,20 @@ import com.yizhi.monitorsystem2.collection.properties.SSHProperties;
 public class SSHUtil {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private SSHProperties sshProperties;
+    private static String CHARSET;
+    private static String OPEN_CHANNEL;
+    private static String STRICT_HOST_KEY_CHECKING;
 
     private String host;
     private Session session;
     private Channel channel;
     private BufferedReader bufferedReader;
+
+    public static void setSSHUtilProperties(SSHProperties sshProperties) {
+        SSHUtil.STRICT_HOST_KEY_CHECKING = sshProperties.getStrictHostKeyChecking();
+        SSHUtil.OPEN_CHANNEL = sshProperties.getOpenChannel();
+        SSHUtil.CHARSET = sshProperties.getCharset();
+    }
 
     public SSHUtil(ServerEntity serverEntity) {
         try {
@@ -37,7 +44,7 @@ public class SSHUtil {
             }
 
             Properties config = new Properties();
-            config.put("StrictHostKeyChecking", sshProperties.getStrictHostKeyChecking());
+            config.put("StrictHostKeyChecking", STRICT_HOST_KEY_CHECKING);
             session.setConfig(config);
 
             session.connect();
@@ -49,13 +56,13 @@ public class SSHUtil {
 
     public BufferedReader readFile(String filePath, int row) {
         try {
-            channel = session.openChannel(sshProperties.getOpenChannel());
+            channel = session.openChannel(OPEN_CHANNEL);
             ((ChannelExec) channel).setCommand("cat " + filePath + " | tail -n +" + row);
             channel.setInputStream(null);
             ((ChannelExec) channel).setErrStream(System.err);
             channel.connect();
             InputStream inputStream = channel.getInputStream();
-            bufferedReader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName(sshProperties.getCharset())));
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName(CHARSET)));
             return bufferedReader;
         } catch (JSchException | IOException e) {
             logger.error(e.getMessage(), e);

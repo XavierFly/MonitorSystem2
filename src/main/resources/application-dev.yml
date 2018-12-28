@@ -9,7 +9,6 @@ logging:
   level:
     com.yizhi: debug
 
-web:
-  server:
-    nginx-log-path: "F:\\localhost_access_log."
-    tomcat-log-path: "F:\\access_"
+log:
+  nginx-log-path: "F:\\access"
+  tomcat-log-path: "F:\\localhost_access_log."
