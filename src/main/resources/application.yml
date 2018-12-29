@@ -54,7 +54,7 @@ time:
 log:
   nginx-log-separator: "_"
   nginx-log-format: ".log"
-  tomcat-log-separator: ""
+  tomcat-log-separator: "."
   tomcat-log-format: ".txt"
 
 

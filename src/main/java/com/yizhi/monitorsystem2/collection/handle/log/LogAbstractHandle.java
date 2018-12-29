@@ -26,9 +26,6 @@ public abstract class LogAbstractHandle {
     protected int newRow;
     protected long currentHourTimestamp;
 
-    public LogAbstractHandle() {
-    }
-
     protected LogAbstractHandle(SSHUtil sshUtil, int currentServerType) {
         this.sshUtil = sshUtil;
         this.host = sshUtil.getHost();

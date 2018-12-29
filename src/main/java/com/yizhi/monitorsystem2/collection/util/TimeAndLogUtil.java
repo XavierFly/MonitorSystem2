@@ -190,7 +190,7 @@ public class TimeAndLogUtil {
                 logTimeSimpleFormat = TOMCAT_LOG_TIME_SIMPLE_FORMAT;
                 logTimeFormatOnTime = TOMCAT_LOG_TIME_FORMAT_ON_HOUR;
                 timestamp = timeToTimestamp(getCurrentTime(logTimeFormat), logTimeFormat);
-                defaultLog = timestampToTime(timestamp, TOMCAT_LOG_TIME_SIMPLE_FORMAT) + TOMCAT_LOG_FORMAT;
+                defaultLog = logSeparator + timestampToTime(timestamp, TOMCAT_LOG_TIME_SIMPLE_FORMAT) + TOMCAT_LOG_FORMAT;
                 break;
             default:
                 throw new BaseException("The server type is not existed");

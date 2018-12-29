@@ -3,10 +3,9 @@ package com.yizhi.monitorsystem2;
 import com.yizhi.monitorsystem2.collection.entity.ServerEntity;
 import com.yizhi.monitorsystem2.collection.entity.ServerTypeEntity;
 import com.yizhi.monitorsystem2.collection.exception.BaseException;
-import com.yizhi.monitorsystem2.collection.handle.log.WebServerAccessLogHandle;
+import com.yizhi.monitorsystem2.collection.handle.log.LogHandle;
 import com.yizhi.monitorsystem2.collection.properties.LogProperties;
 import com.yizhi.monitorsystem2.collection.properties.SSHProperties;
-import com.yizhi.monitorsystem2.collection.properties.TimeProperties;
 import com.yizhi.monitorsystem2.collection.repository.ServerRepository;
 import com.yizhi.monitorsystem2.collection.repository.ServerTypeRepository;
 import com.yizhi.monitorsystem2.collection.util.SSHUtil;
@@ -20,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -30,10 +28,10 @@ public class MonitorSystem2ApplicationTests {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private ServerTypeRepository serverTypeRepository;
+    private ServerRepository serverRepository;
 
     @Autowired
-    private ServerRepository serverRepository;
+    private ServerTypeRepository serverTypeRepository;
 
     @Autowired
     private SSHProperties sshProperties;
@@ -43,22 +41,6 @@ public class MonitorSystem2ApplicationTests {
 
     @Test
     public void contextLoads() {
-    }
-
-    @Test
-    public void test() {
-        WebServerAccessLogHandle webServerAccessLogHandle = new WebServerAccessLogHandle();
-
-        String filepath = "F:\\localhost_access_log.2018-12-28.txt";
-        try {
-            BufferedReader read = new BufferedReader(new FileReader(filepath));
-            String line;
-            while ((line = read.readLine()) != null) {
-                webServerAccessLogHandle.parseCurrentLine(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Test
@@ -91,10 +73,10 @@ public class MonitorSystem2ApplicationTests {
     @Test
     public void test5() {
         ServerEntity serverEntity = new ServerEntity();
-        serverEntity.setHost("192.168.1.101");
+        serverEntity.setHost("192.168.36.133");
         serverEntity.setPort(22);
-        serverEntity.setUser("wangxiang");
-        serverEntity.setPassword("YZ_wx142$#1131");
+        serverEntity.setUser("xavierw");
+        serverEntity.setPassword("BePatient1991");
         serverEntity.setTypes(new int[]{2});
         serverRepository.save(serverEntity);
     }
@@ -103,7 +85,13 @@ public class MonitorSystem2ApplicationTests {
     public void test6() {
         List<ServerEntity> serverEntityList = serverRepository.findAll();
         SSHUtil sshUtil = new SSHUtil(serverEntityList.get(0));
-        BufferedReader bufferedReader = sshUtil.readFile("/data/logs/tomcat/localhost_access_log.2018-12-28.txt", 0);
+        String logFilePath;
+        try {
+            logFilePath = TimeAndLogUtil.getLogFilePath(2);
+        } catch (BaseException e) {
+            return;
+        }
+        BufferedReader bufferedReader = sshUtil.readFile(logFilePath, 0);
         try {
             System.out.println(bufferedReader.readLine());
         } catch (IOException e) {
@@ -117,6 +105,12 @@ public class MonitorSystem2ApplicationTests {
         System.out.println(sshProperties.getCharset());
         System.out.println(logProperties.getNginxLogSeparator());
         System.out.println(logProperties.getTomcatLogSeparator());
+    }
+
+    @Test
+    public void test8() {
+        // System.out.println(serverRepository.findById("5c27166ac757d327f84276b7"));
+        new LogHandle("5c27166ac757d327f84276b7").handle();
     }
 }
 

@@ -10,5 +10,5 @@ logging:
     com.yizhi: debug
 
 log:
-  nginx-log-path: "F:\\access"
-  tomcat-log-path: "F:\\localhost_access_log."
+  nginx-log-path: "/data/logs/tomcat/access"
+  tomcat-log-path: "/data/logs/tomcat/localhost_access_log"

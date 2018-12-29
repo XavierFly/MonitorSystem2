@@ -12,7 +12,9 @@ import com.yizhi.monitorsystem2.collection.entity.ServerEntity;
 import com.yizhi.monitorsystem2.collection.entity.ServerTypeEntity;
 import com.yizhi.monitorsystem2.collection.repository.ServerRepository;
 import com.yizhi.monitorsystem2.collection.repository.ServerTypeRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class LogHandle {
     @Autowired
     private ServerRepository serverRepository;
@@ -24,12 +26,12 @@ public class LogHandle {
 
     private ServerEntity serverEntity;
 
-    protected LogHandle(String serverId) {
+    public LogHandle(String serverId) {
         Optional<ServerEntity> serverEntityOptional = serverRepository.findById(serverId);
         serverEntityOptional.ifPresent(serverEntity -> this.serverEntity = serverEntity);
     }
 
-    private void handle() {
+    public void handle() {
         SSHUtil sshUtil = new SSHUtil(serverEntity);
 
         int[] serverTypes = serverEntity.getTypes();

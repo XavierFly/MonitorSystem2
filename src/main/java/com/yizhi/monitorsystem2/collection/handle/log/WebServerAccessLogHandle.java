@@ -18,9 +18,6 @@ public class WebServerAccessLogHandle extends LogAbstractHandle {
     private List<String> currentLineList;
     private List<WebServerAccessLogEntity> webServerAccessLogEntityList = new ArrayList<>();
 
-    public WebServerAccessLogHandle() {
-    }
-
     protected WebServerAccessLogHandle(SSHUtil sshUtil, int currentServerType) {
         super(sshUtil, currentServerType);
     }
