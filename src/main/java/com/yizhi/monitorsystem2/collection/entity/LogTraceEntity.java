@@ -6,34 +6,27 @@ import lombok.ToString;
 import javax.validation.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
 @ToString
-@Document(collection = "web_server_access_log")
-public class WebServerAccessLogEntity {
+@Document(collection = "log_trace")
+public class LogTraceEntity {
     @Id
     private String id;
-
-    private long timestamp;
-
-    private String ip;
-
-    private String url;
-
-    @Field("status_code")
-    private int statusCode;
-
-    @Field("server_type")
-    private int serverType;
 
     @NotEmpty
     private String host;
 
-    @Field("end_timestamp")
-    private long endTimestamp;
+    @Field("server_type")
+    private int serverType;
+
+    private int lastRow;
+
+    @Field("last_timestamp")
+    private long lastTimestamp;
 
     @CreatedDate
     @Field("create_timestamp")

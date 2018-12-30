@@ -8,3 +8,7 @@ spring:
 logging:
   level:
     com.yizhi: debug
+
+log:
+  nginx-log-path: "/data/logs/tomcat/access"
+  tomcat-log-path: "/data/logs/tomcat/localhost_access_log"
