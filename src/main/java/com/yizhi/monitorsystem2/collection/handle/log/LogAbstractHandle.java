@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.PostConstruct;
+import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.yizhi.monitorsystem2.collection.util.SSHUtil;
@@ -12,23 +14,33 @@ import com.yizhi.monitorsystem2.collection.entity.LogTraceEntity;
 import com.yizhi.monitorsystem2.collection.exception.BaseException;
 import com.yizhi.monitorsystem2.collection.repository.LogTraceRepository;
 
+@Service
 public abstract class LogAbstractHandle {
+    protected Logger logger = LoggerFactory.getLogger(getClass());
+
+    private static LogAbstractHandle proxy;
+
     @Autowired
     private LogTraceRepository logTraceRepository;
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
-
     private SSHUtil sshUtil;
-
     protected String host;
     protected int currentServerType;
     protected int lastRow;
     protected int newRow;
     protected long currentHourTimestamp;
 
-    protected LogAbstractHandle(SSHUtil sshUtil, int currentServerType) {
+    @PostConstruct
+    public void init() {
+        proxy = this;
+    }
+
+    public void setSshUtil(SSHUtil sshUtil) {
         this.sshUtil = sshUtil;
         this.host = sshUtil.getHost();
+    }
+
+    public void setCurrentServerType(int currentServerType) {
         this.currentServerType = currentServerType;
     }
 
@@ -37,22 +49,27 @@ public abstract class LogAbstractHandle {
     protected abstract void saveLogEntity();
 
     public void handle() {
-        LogTraceEntity logTraceEntity = logTraceRepository.findByHostAndServerType(host, currentServerType);
-        lastRow = logTraceEntity.getLastRow();
-
         try {
             currentHourTimestamp = TimeAndLogUtil.getCurrentHourTimestamp();
         } catch (BaseException e) {
             return;
         }
 
-        if (logTraceEntity.getLastTimestamp() == currentHourTimestamp && lastRow != 0) {
-            return;
+        LogTraceEntity logTraceEntity;
+        try {
+            logTraceEntity = proxy.logTraceRepository.findByHostAndServerType(host, currentServerType);
+            lastRow = logTraceEntity.getLastRow();
+            if (logTraceEntity.getLastTimestamp() == currentHourTimestamp && lastRow != 0) {
+                return;
+            }
+        } catch (Exception e) {
+            lastRow = 0;
         }
 
         String logFilePath;
         try {
             logFilePath = TimeAndLogUtil.getLogFilePath(currentServerType);
+            System.out.println(logFilePath);
         } catch (BaseException e) {
             return;
         }
@@ -61,6 +78,7 @@ public abstract class LogAbstractHandle {
         try {
             String currentLine;
             while ((currentLine = bufferedReader.readLine()) != null) {
+                System.out.println(currentLine);
                 if (!parseCurrentLine(currentLine)) {
                     break;
                 }
@@ -86,6 +104,6 @@ public abstract class LogAbstractHandle {
         logTraceEntity.setServerType(currentServerType);
         logTraceEntity.setLastRow(newRow);
         logTraceEntity.setLastTimestamp(currentHourTimestamp);
-        logTraceRepository.save(logTraceEntity);
+        proxy.logTraceRepository.save(logTraceEntity);
     }
 }

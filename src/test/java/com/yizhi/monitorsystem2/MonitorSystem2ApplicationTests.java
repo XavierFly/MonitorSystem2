@@ -3,7 +3,7 @@ package com.yizhi.monitorsystem2;
 import com.yizhi.monitorsystem2.collection.entity.ServerEntity;
 import com.yizhi.monitorsystem2.collection.entity.ServerTypeEntity;
 import com.yizhi.monitorsystem2.collection.exception.BaseException;
-import com.yizhi.monitorsystem2.collection.handle.log.LogHandle;
+import com.yizhi.monitorsystem2.collection.handle.log.LogHandleFrontDesk;
 import com.yizhi.monitorsystem2.collection.properties.LogProperties;
 import com.yizhi.monitorsystem2.collection.properties.SSHProperties;
 import com.yizhi.monitorsystem2.collection.repository.ServerRepository;
@@ -39,6 +39,9 @@ public class MonitorSystem2ApplicationTests {
     @Autowired
     private LogProperties logProperties;
 
+    @Autowired
+    private LogHandleFrontDesk logHandleFrontDesk;
+
     @Test
     public void contextLoads() {
     }
@@ -72,13 +75,15 @@ public class MonitorSystem2ApplicationTests {
 
     @Test
     public void test5() {
-        ServerEntity serverEntity = new ServerEntity();
-        serverEntity.setHost("192.168.36.133");
-        serverEntity.setPort(22);
-        serverEntity.setUser("xavierw");
-        serverEntity.setPassword("BePatient1991");
-        serverEntity.setTypes(new int[]{2});
-        serverRepository.save(serverEntity);
+        // ServerEntity serverEntity = new ServerEntity();
+        // serverEntity.setHost("192.168.36.133");
+        // serverEntity.setPort(22);
+        // serverEntity.setUser("xavierw");
+        // serverEntity.setPassword("BePatient1991");
+        // serverEntity.setTypes(new int[]{2});
+        // serverRepository.save(serverEntity);
+
+        System.out.println(serverRepository.findAll());
     }
 
     @Test
@@ -109,8 +114,8 @@ public class MonitorSystem2ApplicationTests {
 
     @Test
     public void test8() {
-        // System.out.println(serverRepository.findById("5c27166ac757d327f84276b7"));
-        new LogHandle("5c27166ac757d327f84276b7").handle();
+        logHandleFrontDesk.setServerEntity("5c27166ac757d327f84276b7");
+        logHandleFrontDesk.handle();
     }
 }
 

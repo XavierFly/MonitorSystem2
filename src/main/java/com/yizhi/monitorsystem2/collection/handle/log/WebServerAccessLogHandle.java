@@ -3,23 +3,29 @@ package com.yizhi.monitorsystem2.collection.handle.log;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
+import javax.annotation.PostConstruct;
+import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.yizhi.monitorsystem2.collection.util.SSHUtil;
 import com.yizhi.monitorsystem2.collection.util.TimeAndLogUtil;
 import com.yizhi.monitorsystem2.collection.exception.BaseException;
 import com.yizhi.monitorsystem2.collection.entity.WebServerAccessLogEntity;
 import com.yizhi.monitorsystem2.collection.repository.WebServerAccessLogRepository;
 
+@Service
 public class WebServerAccessLogHandle extends LogAbstractHandle {
+    private static WebServerAccessLogHandle proxy;
+
     @Autowired
     private WebServerAccessLogRepository webServerAccessLogRepository;
 
     private List<String> currentLineList;
     private List<WebServerAccessLogEntity> webServerAccessLogEntityList = new ArrayList<>();
 
-    protected WebServerAccessLogHandle(SSHUtil sshUtil, int currentServerType) {
-        super(sshUtil, currentServerType);
+    @PostConstruct
+    public void init() {
+        super.init();
+        proxy = this;
     }
 
     @Override
@@ -30,7 +36,7 @@ public class WebServerAccessLogHandle extends LogAbstractHandle {
 
     @Override
     protected void saveLogEntity() {
-        webServerAccessLogRepository.saveAll(webServerAccessLogEntityList);
+        proxy.webServerAccessLogRepository.saveAll(webServerAccessLogEntityList);
     }
 
     private boolean splitCurrentLine(String currentLine) {
