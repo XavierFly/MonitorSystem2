@@ -3,22 +3,27 @@ package com.yizhi.monitorsystem2.collection.entity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import javax.validation.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
 @ToString
-@Document(collection = "web_server_access_log_trace")
-public class WebServerAccessLogTraceEntity {
+@Document(collection = "server")
+public class ServerEntity {
     @Id
     private String id;
 
-    private int source;
+    @NotEmpty
+    private String host;
 
-    private long last_timestamp;
+    private int port;
 
-    private int row;
+    @NotEmpty
+    private String user;
 
-    private long create_timestamp;
+    private String password;
+
+    private int[] types;
 }
